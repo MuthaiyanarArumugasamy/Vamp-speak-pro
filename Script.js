@@ -1,1987 +1,397 @@
-/* ==========================================
-   SpeakPro Pro Enterprise
-   Main JavaScript
-   Sprint 1 - Part 1
-========================================== */
+/* ==========================================================
+   SpeakAI Pro Enterprise
+   File: js/app.js
+   Version: 1.0
+========================================================== */
 
+document.addEventListener("DOMContentLoaded", () => {
 
+    /* ======================================================
+       LOADER
+    ====================================================== */
 
-// ==========================================
-// PAGE LOADER
-// ==========================================
+    const loader = document.getElementById("loader");
 
+    window.addEventListener("load", () => {
 
-window.addEventListener("load",()=>{
+        if (loader) {
 
-    const loader =
-    document.getElementById("loader");
+            loader.style.opacity = "0";
 
+            setTimeout(() => {
 
-    if(loader){
+                loader.style.display = "none";
 
-        setTimeout(()=>{
-
-            loader.style.display="none";
-
-        },1000);
-
-    }
-
-});
-
-
-
-
-
-
-
-
-// ==========================================
-// MOBILE SIDEBAR MENU
-// ==========================================
-
-
-const mobileMenuBtn =
-document.getElementById("mobileMenuBtn");
-
-
-const sidebar =
-document.querySelector(".sidebar");
-
-
-
-if(mobileMenuBtn){
-
-
-    mobileMenuBtn.addEventListener(
-    "click",
-    ()=>{
-
-
-        sidebar.classList.toggle(
-        "show"
-        );
-
-
-    });
-
-
-}
-
-
-
-
-
-
-
-
-
-// ==========================================
-// PAGE NAVIGATION SYSTEM
-// ==========================================
-
-
-const menuItems =
-document.querySelectorAll(
-".sidebar-menu li"
-);
-
-
-
-const pages =
-document.querySelectorAll(
-".page"
-);
-
-
-
-
-function openPage(pageID){
-
-
-    pages.forEach(page=>{
-
-
-        page.style.display="none";
-
-
-    });
-
-
-
-    const selectedPage =
-    document.getElementById(pageID);
-
-
-
-    if(selectedPage){
-
-        selectedPage.style.display="block";
-
-    }
-
-
-
-}
-
-
-
-
-menuItems.forEach(item=>{
-
-
-    item.addEventListener(
-    "click",
-    ()=>{
-
-
-        menuItems.forEach(
-        menu=>
-        menu.classList.remove(
-        "active"
-        ));
-
-
-
-        item.classList.add(
-        "active"
-        );
-
-
-
-        const target =
-        item.getAttribute(
-        "data-page"
-        );
-
-
-
-        if(target){
-
-            openPage(target);
+            }, 500);
 
         }
 
+    });
+
+    /* ======================================================
+       MOBILE MENU
+    ====================================================== */
+
+    const menuBtn = document.getElementById("menuBtn");
+    const navMenu = document.getElementById("navMenu");
+
+    if (menuBtn && navMenu) {
+
+        menuBtn.addEventListener("click", () => {
+
+            navMenu.classList.toggle("active");
+
+            const icon = menuBtn.querySelector("i");
+
+            if (icon) {
+
+                icon.classList.toggle("fa-bars");
+                icon.classList.toggle("fa-xmark");
+
+            }
+
+        });
+
+    }
+
+    /* ======================================================
+       DARK MODE
+    ====================================================== */
+
+    const themeBtn = document.getElementById("themeToggle");
+
+    const savedTheme = localStorage.getItem("theme");
+
+    if (savedTheme === "dark") {
+
+        document.body.classList.add("dark");
+
+        if (themeBtn) {
+
+            themeBtn.innerHTML =
+                '<i class="fa-solid fa-sun"></i>';
+
+        }
+
+    }
+
+    if (themeBtn) {
+
+        themeBtn.addEventListener("click", () => {
+
+            document.body.classList.toggle("dark");
+
+            const dark =
+                document.body.classList.contains("dark");
+
+            localStorage.setItem(
+                "theme",
+                dark ? "dark" : "light"
+            );
+
+            themeBtn.innerHTML = dark
+                ? '<i class="fa-solid fa-sun"></i>'
+                : '<i class="fa-solid fa-moon"></i>';
+
+        });
+
+    }
+
+    /* ======================================================
+       SMOOTH SCROLL
+    ====================================================== */
+
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+
+        link.addEventListener("click", e => {
+
+            const target =
+                document.querySelector(link.getAttribute("href"));
+
+            if (!target) return;
+
+            e.preventDefault();
+
+            target.scrollIntoView({
+
+                behavior: "smooth"
+
+            });
+
+            navMenu?.classList.remove("active");
+
+        });
 
     });
 
+    /* ======================================================
+       FAQ
+    ====================================================== */
 
-});
+    const faqItems =
+        document.querySelectorAll(".faq-item");
 
+    faqItems.forEach(item => {
 
+        const btn =
+            item.querySelector(".faq-question");
 
+        btn?.addEventListener("click", () => {
 
+            faqItems.forEach(f => {
 
+                if (f !== item) {
 
+                    f.classList.remove("active");
 
+                }
 
-// ==========================================
-// DARK MODE
-// ==========================================
+            });
 
+            item.classList.toggle("active");
 
-const darkModeToggle =
-document.getElementById(
-"darkModeSetting"
-);
+        });
 
+    });
 
+    /* ======================================================
+       SCROLL REVEAL
+    ====================================================== */
 
-if(darkModeToggle){
+    const revealItems = document.querySelectorAll(
 
+        ".feature-card,.course-card,.testimonial-card,.pricing-card,.stat-card,.why-content,.why-image"
 
-darkModeToggle.addEventListener(
-"change",
-()=>{
-
-
-    document.body.classList.toggle(
-    "dark"
     );
 
+    const reveal = () => {
 
-    localStorage.setItem(
-    "darkMode",
-    document.body.classList.contains(
-    "dark"
-    )
-    );
+        const trigger = window.innerHeight * 0.85;
 
+        revealItems.forEach(el => {
+
+            const top =
+                el.getBoundingClientRect().top;
+
+            if (top < trigger) {
+
+                el.classList.add("fade-up");
+
+            }
+
+        });
+
+    };
+
+    reveal();
+
+    window.addEventListener("scroll", reveal);
+
+    /* ======================================================
+       COUNTER
+    ====================================================== */
+
+    const counters =
+        document.querySelectorAll(".stat-card h2");
+
+    let counted = false;
+
+    function runCounter() {
+
+        if (counted) return;
+
+        const section =
+            document.querySelector(".statistics");
+
+        if (!section) return;
+
+        const top =
+            section.getBoundingClientRect().top;
+
+        if (top > window.innerHeight * 0.8) return;
+
+        counted = true;
+
+        counters.forEach(counter => {
+
+            const text =
+                counter.textContent;
+
+            const number =
+                parseInt(text.replace(/\D/g, ""));
+
+            const suffix =
+                text.replace(/[0-9]/g, "");
+
+            let value = 0;
+
+            const step =
+                Math.max(1, Math.ceil(number / 80));
+
+            const timer = setInterval(() => {
+
+                value += step;
+
+                if (value >= number) {
+
+                    value = number;
+
+                    clearInterval(timer);
+
+                }
+
+                counter.textContent =
+                    value + suffix;
+
+            }, 20);
+
+        });
+
+    }
+
+    runCounter();
+
+    window.addEventListener("scroll", runCounter);
+
+    /* ======================================================
+       BACK TO TOP BUTTON
+    ====================================================== */
+
+    const topBtn = document.createElement("button");
+
+    topBtn.className = "back-to-top";
+
+    topBtn.innerHTML =
+        '<i class="fa-solid fa-arrow-up"></i>';
+
+    document.body.appendChild(topBtn);
+
+    window.addEventListener("scroll", () => {
+
+        if (window.scrollY > 500) {
+
+            topBtn.classList.add("show");
+
+        } else {
+
+            topBtn.classList.remove("show");
+
+        }
+
+    });
+
+    topBtn.addEventListener("click", () => {
+
+        window.scrollTo({
+
+            top: 0,
+
+            behavior: "smooth"
+
+        });
+
+    });
+
+    /* ======================================================
+       ACTIVE NAV LINK
+    ====================================================== */
+
+    const sections =
+        document.querySelectorAll("section[id]");
+
+    const navLinks =
+        document.querySelectorAll("nav a");
+
+    window.addEventListener("scroll", () => {
+
+        let current = "";
+
+        sections.forEach(section => {
+
+            const top = section.offsetTop - 120;
+
+            if (window.scrollY >= top) {
+
+                current = section.id;
+
+            }
+
+        });
+
+        navLinks.forEach(link => {
+
+            link.classList.remove("active");
+
+            if (
+
+                link.getAttribute("href") === "#" + current
+
+            ) {
+
+                link.classList.add("active");
+
+            }
+
+        });
+
+    });
+
+    /* ======================================================
+       CONTACT FORM
+    ====================================================== */
+
+    const contactForm =
+        document.querySelector(".contact form");
+
+    contactForm?.addEventListener("submit", e => {
+
+        e.preventDefault();
+
+        alert("✅ Thank you! Your message has been received.");
+
+        contactForm.reset();
+
+    });
+
+    /* ======================================================
+       NEWSLETTER
+    ====================================================== */
+
+    const newsForm =
+        document.querySelector(".newsletter-form");
+
+    newsForm?.addEventListener("submit", e => {
+
+        e.preventDefault();
+
+        const email =
+            newsForm.querySelector("input").value.trim();
+
+        if (!email) {
+
+            alert("Please enter your email.");
+
+            return;
+
+        }
+
+        alert("🎉 Successfully subscribed!");
+
+        newsForm.reset();
+
+    });
+
+    /* ======================================================
+       CHAT BUTTON
+    ====================================================== */
+
+    const chatBtn =
+        document.querySelector(".chat-btn");
+
+    chatBtn?.addEventListener("click", () => {
+
+        window.location.href = "register.html";
+
+    });
 
 });
-
-
-}
-
-
-
-
-// Load saved theme
-
-
-if(
-localStorage.getItem(
-"darkMode"
-)==="true"
-){
-
-
-document.body.classList.add(
-"dark"
-);
-
-
-if(darkModeToggle){
-
-darkModeToggle.checked=true;
-
-}
-
-
-}
-
-
-
-
-
-
-
-
-// ==========================================
-// NOTIFICATION PANEL
-// ==========================================
-
-
-const notificationBtn =
-document.getElementById(
-"notificationBtn"
-);
-
-
-const notificationPanel =
-document.getElementById(
-"notificationPanel"
-);
-
-
-
-const closeNotifications =
-document.getElementById(
-"closeNotifications"
-);
-
-
-
-
-
-if(notificationBtn){
-
-
-notificationBtn.addEventListener(
-"click",
-()=>{
-
-
-notificationPanel.classList.toggle(
-"active"
-);
-
-
-});
-
-
-}
-
-
-
-
-
-if(closeNotifications){
-
-
-closeNotifications.addEventListener(
-"click",
-()=>{
-
-
-notificationPanel.classList.remove(
-"active"
-);
-
-
-});
-
-
-}
-
-
-
-
-
-
-
-
-// ==========================================
-// BUTTON ANIMATION
-// ==========================================
-
-
-const buttons =
-document.querySelectorAll(
-"button"
-);
-
-
-
-buttons.forEach(btn=>{
-
-
-btn.addEventListener(
-"click",
-()=>{
-
-
-btn.style.transform=
-"scale(.95)";
-
-
-setTimeout(()=>{
-
-
-btn.style.transform=
-"";
-
-
-},150);
-
-
-
-});
-
-
-});
-
-
-
-
-
-
-
-
-// ==========================================
-// INITIAL PAGE
-// ==========================================
-
-
-document.addEventListener(
-"DOMContentLoaded",
-()=>{
-
-
-const dashboard =
-document.getElementById(
-"dashboardPage"
-);
-
-
-
-if(dashboard){
-
-dashboard.style.display=
-"block";
-
-}
-
-
-
-});
-
-/* ==========================================
-   AUTHENTICATION UI
-========================================== */
-
-
-const loginBtn =
-document.getElementById("loginBtn");
-
-
-const registerBtn =
-document.getElementById("registerBtn");
-
-
-const loginModal =
-document.getElementById("loginModal");
-
-
-const registerModal =
-document.getElementById("registerModal");
-
-
-
-const closeButtons =
-document.querySelectorAll(".modal-close");
-
-
-
-
-
-
-
-// Open Login Modal
-
-if(loginBtn){
-
-
-loginBtn.addEventListener(
-"click",
-()=>{
-
-
-loginModal.style.display="flex";
-
-
-});
-
-
-}
-
-
-
-
-
-
-
-// Open Register Modal
-
-if(registerBtn){
-
-
-registerBtn.addEventListener(
-"click",
-()=>{
-
-
-registerModal.style.display="flex";
-
-
-});
-
-
-}
-
-
-
-
-
-
-
-// Close Modals
-
-closeButtons.forEach(btn=>{
-
-
-btn.addEventListener(
-"click",
-()=>{
-
-
-document
-.querySelectorAll(".modal")
-.forEach(modal=>{
-
-
-modal.style.display="none";
-
-
-});
-
-
-});
-
-
-});
-
-
-
-
-
-
-
-
-// Close modal outside click
-
-
-window.addEventListener(
-"click",
-(e)=>{
-
-
-document
-.querySelectorAll(".modal")
-.forEach(modal=>{
-
-
-if(e.target===modal){
-
-
-modal.style.display="none";
-
-
-}
-
-
-});
-
-
-});
-
-
-
-
-
-
-
-
-
-// ==========================================
-// FIREBASE AUTH READY FUNCTIONS
-// ==========================================
-
-
-
-let currentUser = null;
-
-
-
-
-
-
-// Register User
-
-
-async function registerUser(
-email,
-password,
-name
-){
-
-
-try{
-
-
-/*
-
-Firebase Authentication
-
-Will connect after firebase-config.js setup
-
-Example:
-
-createUserWithEmailAndPassword(
-auth,
-email,
-password
-)
-
-
-*/
-
-
-console.log(
-"Register User:",
-email
-);
-
-
-
-alert(
-"Account created successfully"
-);
-
-
-
-}
-
-
-catch(error){
-
-
-console.log(
-error.message
-);
-
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// Login User
-
-
-async function loginUser(
-email,
-password
-){
-
-
-
-try{
-
-
-console.log(
-"Login:",
-email
-);
-
-
-
-alert(
-"Login successful"
-);
-
-
-
-}
-
-
-
-catch(error){
-
-
-console.log(
-error.message
-);
-
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// Logout User
-
-
-async function logoutUser(){
-
-
-try{
-
-
-currentUser=null;
-
-
-
-localStorage.removeItem(
-"user"
-);
-
-
-
-alert(
-"Logged out successfully"
-);
-
-
-
-location.reload();
-
-
-
-}
-
-
-
-catch(error){
-
-
-console.log(
-error.message
-);
-
-
-}
-
-
-}
-
-
-
-
-
-
-
-
-// ==========================================
-// USER PROFILE DISPLAY
-========================================== */
-
-
-function loadUserProfile(user){
-
-
-
-if(!user)
-return;
-
-
-
-const username =
-document.getElementById(
-"userName"
-);
-
-
-
-const email =
-document.getElementById(
-"userEmail"
-);
-
-
-
-
-
-if(username){
-
-username.innerText =
-user.name ||
-"Student";
-
-
-}
-
-
-
-
-if(email){
-
-email.innerText =
-user.email ||
-"";
-
-
-}
-
-
-
-
-}
-
-
-
-
-
-
-
-
-// ==========================================
-// FIRESTORE USER DATA
-==========================================
-
-
-
-async function saveUserData(
-uid,
-data
-){
-
-
-
-/*
-
-Firestore connection:
-
-await setDoc(
-doc(db,"users",uid),
-data
-);
-
-
-*/
-
-
-console.log(
-"Saving user data",
-data
-);
-
-
-
-}
-
-
-
-
-
-
-
-
-async function getUserData(
-uid
-){
-
-
-
-/*
-
-Firestore:
-
-const userDoc =
-await getDoc(
-doc(db,"users",uid)
-);
-
-
-*/
-
-
-
-console.log(
-"Loading user:",
-uid
-);
-
-
-
-}
-
-
-
-
-
-
-
-
-// ==========================================
-// FORM HANDLERS
-==========================================
-
-
-
-const loginForm =
-document.getElementById(
-"loginForm"
-);
-
-
-
-if(loginForm){
-
-
-
-loginForm.addEventListener(
-"submit",
-(e)=>{
-
-
-e.preventDefault();
-
-
-
-const email =
-document.getElementById(
-"loginEmail"
-).value;
-
-
-
-const password =
-document.getElementById(
-"loginPassword"
-).value;
-
-
-
-
-loginUser(
-email,
-password
-);
-
-
-
-});
-
-
-}
-
-
-
-
-
-
-
-
-const registerForm =
-document.getElementById(
-"registerForm"
-);
-
-
-
-if(registerForm){
-
-
-
-registerForm.addEventListener(
-"submit",
-(e)=>{
-
-
-e.preventDefault();
-
-
-
-const name =
-document.getElementById(
-"registerName"
-).value;
-
-
-
-const email =
-document.getElementById(
-"registerEmail"
-).value;
-
-
-
-const password =
-document.getElementById(
-"registerPassword"
-).value;
-
-
-
-registerUser(
-email,
-password,
-name
-);
-
-
-
-});
-
-
-}
-
-/* ==========================================
-   AI TUTOR CHAT SYSTEM
-========================================== */
-
-
-const chatInput =
-document.getElementById(
-"aiMessageInput"
-);
-
-
-const sendBtn =
-document.querySelector(
-".send-btn"
-);
-
-
-const chatMessages =
-document.getElementById(
-"chatMessages"
-);
-
-
-
-
-
-function addMessage(
-message,
-type
-){
-
-
-if(!chatMessages)
-return;
-
-
-
-const div =
-document.createElement(
-"div"
-);
-
-
-
-div.className =
-"message " + type;
-
-
-
-div.innerHTML = `
-
-<div class="message-content">
-
-${message}
-
-</div>
-
-`;
-
-
-
-chatMessages.appendChild(div);
-
-
-
-chatMessages.scrollTop =
-chatMessages.scrollHeight;
-
-
-}
-
-
-
-
-
-
-
-
-function aiResponse(
-question
-){
-
-
-let answer =
-"";
-
-
-
-if(
-question.toLowerCase()
-.includes("hello")
-){
-
-
-answer =
-"Hello! 👋 Nice to meet you. Let's practice English together.";
-
-
-}
-
-else if(
-question.toLowerCase()
-.includes("grammar")
-){
-
-
-answer =
-"I can help you correct grammar mistakes and explain rules.";
-
-
-}
-
-else if(
-question.toLowerCase()
-.includes("vocabulary")
-){
-
-
-answer =
-"Try learning 10 new words every day with examples.";
-
-
-}
-
-else{
-
-
-answer =
-"Good practice! Keep speaking. Your confidence will improve.";
-
-
-}
-
-
-
-
-setTimeout(()=>{
-
-
-addMessage(
-answer,
-"ai-message"
-);
-
-
-},800);
-
-
-
-}
-
-
-
-
-
-
-
-
-if(sendBtn){
-
-
-sendBtn.addEventListener(
-"click",
-()=>{
-
-
-const text =
-chatInput.value.trim();
-
-
-
-if(text){
-
-
-addMessage(
-text,
-"user-message"
-);
-
-
-
-chatInput.value="";
-
-
-
-aiResponse(text);
-
-
-
-}
-
-
-});
-
-
-}
-
-
-
-
-
-
-
-
-if(chatInput){
-
-
-chatInput.addEventListener(
-"keypress",
-(e)=>{
-
-
-if(e.key==="Enter"){
-
-
-sendBtn.click();
-
-
-}
-
-
-
-});
-
-
-}
-
-
-
-
-
-
-
-
-
-// ==========================================
-// SPEECH RECOGNITION
-// ==========================================
-
-
-
-const recordBtn =
-document.querySelector(
-".record-btn"
-);
-
-
-
-let recognition;
-
-
-
-if(
-"webkitSpeechRecognition"
-in window
-){
-
-
-
-recognition =
-new webkitSpeechRecognition();
-
-
-
-recognition.continuous=false;
-
-recognition.lang=
-"en-US";
-
-
-
-
-
-recognition.onresult =
-function(event){
-
-
-const speech =
-event.results[0][0].transcript;
-
-
-
-alert(
-"Your speech:\n"+speech
-);
-
-
-
-};
-
-
-
-
-recognition.onerror =
-function(){
-
-
-alert(
-"Voice recognition failed"
-);
-
-
-};
-
-
-
-}
-
-
-
-
-
-
-
-if(recordBtn){
-
-
-recordBtn.addEventListener(
-"click",
-()=>{
-
-
-if(recognition){
-
-
-recognition.start();
-
-
-alert(
-"Start speaking..."
-);
-
-
-}
-
-else{
-
-
-alert(
-"Speech recognition not supported"
-);
-
-
-}
-
-
-
-});
-
-
-}
-
-
-
-
-
-
-
-
-
-// ==========================================
-// FLASH CARD SYSTEM
-========================================== */
-
-
-const flashButtons =
-document.querySelectorAll(
-".flash-card button"
-);
-
-
-
-flashButtons.forEach(
-button=>{
-
-
-button.addEventListener(
-"click",
-()=>{
-
-
-button.parentElement.classList.toggle(
-"active"
-);
-
-
-
-});
-
-
-});
-
-
-
-
-
-
-
-
-
-// ==========================================
-// QUIZ SYSTEM
-==========================================
-
-
-
-const quizOptions =
-document.querySelectorAll(
-".quiz-option"
-);
-
-
-
-quizOptions.forEach(
-option=>{
-
-
-option.addEventListener(
-"click",
-()=>{
-
-
-quizOptions.forEach(
-item=>{
-
-item.style.border=
-"none";
-
-});
-
-
-
-option.style.border=
-"2px solid #2563eb";
-
-
-
-});
-
-
-});
-
-
-
-
-
-
-
-
-// ==========================================
-// COURSE PROGRESS
-==========================================
-
-
-
-function updateProgress(
-element,
-value
-){
-
-
-if(!element)
-return;
-
-
-
-element.style.width =
-value+"%";
-
-
-}
-
-
-
-
-
-
-
-// Example progress update
-
-
-document
-.querySelectorAll(
-".progress-fill"
-)
-.forEach(
-bar=>{
-
-
-const value =
-bar.style.width;
-
-
-
-updateProgress(
-bar,
-parseInt(value)
-);
-
-
-
-});
-
-
-
-
-
-
-
-
-
-// ==========================================
-// CERTIFICATE CHECK
-==========================================
-
-
-
-function checkCertificate(
-completedLessons
-){
-
-
-
-if(
-completedLessons >= 10
-){
-
-
-console.log(
-"Certificate unlocked"
-);
-
-
-
-}
-
-
-}
-
-
-
-
-
-
-
-
-// ==========================================
-// LOCAL USER PROGRESS
-==========================================
-
-
-
-function saveProgress(
-data
-){
-
-
-localStorage.setItem(
-"SpeakProProgress",
-JSON.stringify(data)
-);
-
-
-
-}
-
-
-
-
-function loadProgress(){
-
-
-return JSON.parse(
-
-localStorage.getItem(
-"SpeakProProgress"
-)
-
-) || {};
-
-}
-
-
-
-
-
-
-/* ==========================================
-   VIDEO LESSON CONTROLS
-========================================== */
-
-
-const playButtons =
-document.querySelectorAll(
-".play-button, .video-card button"
-);
-
-
-
-playButtons.forEach(button=>{
-
-
-button.addEventListener(
-"click",
-()=>{
-
-
-alert(
-"Video player opened 🎬"
-);
-
-
-
-});
-
-
-});
-
-
-
-
-
-
-
-
-/* ==========================================
-   PRACTICE TEST TIMER
-========================================== */
-
-
-let examTime = 1200; // 20 minutes
-
-
-
-const timerElement =
-document.querySelector(
-".timer"
-);
-
-
-
-function startExamTimer(){
-
-
-if(!timerElement)
-return;
-
-
-
-const timer =
-setInterval(()=>{
-
-
-let minutes =
-Math.floor(examTime / 60);
-
-
-
-let seconds =
-examTime % 60;
-
-
-
-seconds =
-seconds < 10 ?
-"0"+seconds :
-seconds;
-
-
-
-timerElement.innerHTML =
-
-`
-<i class="fa-solid fa-clock"></i>
-${minutes}:${seconds}
-`;
-
-
-
-examTime--;
-
-
-
-if(examTime < 0){
-
-
-clearInterval(timer);
-
-
-timerElement.innerHTML =
-"Time Over";
-
-
-}
-
-
-
-},1000);
-
-
-
-}
-
-
-
-startExamTimer();
-
-
-
-
-
-
-
-
-
-/* ==========================================
-   LEADERBOARD XP SYSTEM
-========================================== */
-
-
-
-let userXP =
-localStorage.getItem(
-"SpeakProXP"
-)
-|| 0;
-
-
-
-
-function addXP(points){
-
-
-userXP =
-Number(userXP)+points;
-
-
-
-localStorage.setItem(
-"SpeakProXP",
-userXP
-);
-
-
-
-console.log(
-"XP:",
-userXP
-);
-
-
-}
-
-
-
-
-
-
-
-// Example learning rewards
-
-
-document
-.querySelectorAll(
-".primary-btn"
-)
-.forEach(button=>{
-
-
-button.addEventListener(
-"click",
-()=>{
-
-
-addXP(10);
-
-
-});
-
-
-});
-
-
-
-
-
-
-
-
-
-/* ==========================================
-   NOTIFICATION SYSTEM
-========================================== */
-
-
-function showNotification(
-message
-){
-
-
-const notification =
-document.createElement(
-"div"
-);
-
-
-
-notification.className =
-"toast-notification";
-
-
-
-notification.innerHTML = `
-
-<i class="fa-solid fa-bell"></i>
-
-${message}
-
-`;
-
-
-
-document.body.appendChild(
-notification
-);
-
-
-
-setTimeout(()=>{
-
-
-notification.remove();
-
-
-},3000);
-
-
-
-}
-
-
-
-
-
-
-
-
-/* ==========================================
-   SEARCH SYSTEM
-========================================== */
-
-
-const searchInputs =
-document.querySelectorAll(
-"input[type='search']"
-);
-
-
-
-searchInputs.forEach(
-input=>{
-
-
-input.addEventListener(
-"keyup",
-()=>{
-
-
-let value =
-input.value.toLowerCase();
-
-
-
-document
-.querySelectorAll(
-".course-card, .video-card, .test-card"
-)
-.forEach(card=>{
-
-
-let text =
-card.innerText.toLowerCase();
-
-
-
-if(text.includes(value)){
-
-
-card.style.display =
-"block";
-
-
-}
-
-else{
-
-
-card.style.display =
-"none";
-
-
-}
-
-
-
-});
-
-
-});
-
-
-});
-
-
-
-
-
-
-
-
-/* ==========================================
-   PWA SERVICE WORKER
-========================================== */
-
-
-if(
-"serviceWorker" in navigator
-){
-
-
-
-window.addEventListener(
-"load",
-()=>{
-
-
-navigator.serviceWorker
-.register(
-"/service-worker.js"
-)
-
-.then(()=>{
-
-
-console.log(
-"SpeakPro PWA Ready"
-);
-
-
-})
-
-.catch(error=>{
-
-
-console.log(
-"PWA Error",
-error
-);
-
-
-});
-
-
-});
-
-
-}
-
-
-
-
-
-
-
-
-
-/* ==========================================
-   APPLICATION START
-========================================== */
-
-
-document.addEventListener(
-"DOMContentLoaded",
-()=>{
-
-
-console.log(
-"SpeakPro Pro Enterprise Loaded 🚀"
-);
-
-
-
-showNotification(
-"Welcome to SpeakPro Pro!"
-);
-
-
-
-});
-
